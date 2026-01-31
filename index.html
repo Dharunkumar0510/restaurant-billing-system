@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>South Delight - Restaurant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>South Delight</h1>
+        <p class="tagline">Authentic South Indian Cuisine</p>
+        <nav class="main-nav">
+            <button class="nav-btn active" data-view="menu">Menu & Billing</button>
+            <button class="nav-btn" data-view="manage">Manage Menu</button>
+            <button class="nav-btn" data-view="reports">Sales Report</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Menu & Billing View -->
+        <section id="menu-view" class="view active">
+            <div class="menu-section">
+                <h2>Our Menu</h2>
+                <div id="menu-grid" class="menu-grid">
+                    <!-- Menu items populated by JS -->
+                </div>
+            </div>
+            <aside class="cart-section">
+                <div class="cart-header">
+                    <h2>Your Order</h2>
+                    <button id="clear-cart" class="btn btn-danger">Clear Cart</button>
+                </div>
+                <div id="cart-items" class="cart-items">
+                    <p class="empty-cart">Cart is empty. Click items to add.</p>
+                </div>
+                <div class="cart-footer">
+                    <div class="total">
+                        <span>Total:</span>
+                        <span id="cart-total">₹0</span>
+                    </div>
+                    <button id="pay-now" class="btn btn-primary">Pay Now</button>
+                    <button id="print-bill" class="btn btn-secondary">Print Bill</button>
+                </div>
+            </aside>
+        </section>
+
+        <!-- Manage Menu View -->
+        <section id="manage-view" class="view">
+            <div class="manage-section">
+                <h2>Manage Menu</h2>
+                <button id="add-menu-btn" class="btn btn-primary">+ Add New Item</button>
+                <div id="manage-menu-list" class="manage-menu-list">
+                    <!-- Managed items populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Sales Report View -->
+        <section id="reports-view" class="view">
+            <div class="reports-section">
+                <h2>Monthly Sales Report</h2>
+                <div class="report-controls">
+                    <label>Month: <input type="month" id="report-month"></label>
+                    <button id="generate-report" class="btn btn-primary">Generate Report</button>
+                </div>
+                <div id="report-content" class="report-content">
+                    <p class="empty-report">Select month and click Generate Report</p>
+                </div>
+                <button id="print-report" class="btn btn-secondary" style="margin-top: 1rem;">Print Report</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Add/Edit Menu Item Modal -->
+    <div id="menu-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="modal-title">Add Menu Item</h2>
+            <form id="menu-form">
+                <input type="hidden" id="item-id">
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="item-name" required placeholder="e.g., Idly">
+                </div>
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="number" id="item-price" required min="0" step="0.01" placeholder="50">
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="item-image" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" id="item-category" placeholder="Breakfast, Snacks, Beverage">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pay Now Modal with QR -->
+    <div id="pay-modal" class="modal">
+        <div class="modal-content pay-modal-content">
+            <span class="modal-close pay-close">&times;</span>
+            <h2>Pay Now</h2>
+            <p>Scan QR Code to Pay</p>
+            <div id="qr-code" class="qr-container"></div>
+            <p class="amount-display">Amount: <strong id="pay-amount">₹0</strong></p>
+            <p class="upi-id">UPI: southdelight@paytm</p>
+            <button id="confirm-payment" class="btn btn-primary">Confirm Payment</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
