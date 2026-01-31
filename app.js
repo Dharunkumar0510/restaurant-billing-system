@@ -9,11 +9,11 @@ const SALES_KEY = "sd_sales";
 
 // ---------- Default Menu ----------
 const defaultMenu = [
-  { id: 1, name: "Idly", price: 30, image: "images/idly.jpg", category: "Breakfast" },
-  { id: 2, name: "Dosa", price: 50, image: "images/dosa.jpg", category: "Breakfast" },
-  { id: 3, name: "Poori", price: 45, image: "images/poori.jpg", category: "Breakfast" },
-  { id: 4, name: "Vada", price: 15, image: "images/vada.jpg", category: "Snacks" },
-  { id: 5, name: "Coffee", price: 20, image: "images/coffee.jpg", category: "Beverage" },
+  { id: 1, name: "Idly", price: 30, image: "idly.jpg", category: "Breakfast" },
+  { id: 2, name: "Dosa", price: 50, image: "dosa.jpg", category: "Breakfast" },
+  { id: 3, name: "Poori", price: 45, image: "poori.jpg", category: "Breakfast" },
+  { id: 4, name: "Vada", price: 15, image: "vada.jpg", category: "Snacks" },
+  { id: 5, name: "Coffee", price: 20, image: "coffee.jpg", category: "Beverage" },
 ];
 
 // ---------- State ----------
