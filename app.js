@@ -1,5 +1,4 @@
 // ===== PAYMENT ELEMENTS =====
-const payNowBtn = document.getElementById("pay-now");
 const payModal = document.getElementById("pay-modal");
 const payClose = document.querySelector(".pay-close");
 const payAmountText = document.getElementById("pay-amount");
