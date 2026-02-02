@@ -1,3 +1,10 @@
+// ===== PAYMENT ELEMENTS =====
+const payNowBtn = document.getElementById("pay-now");
+const payModal = document.getElementById("pay-modal");
+const payClose = document.querySelector(".pay-close");
+const payAmountText = document.getElementById("pay-amount");
+
+const UPI_ID = "southdelight@paytm";
 /***********************
  * South Delight - app.js
  ***********************/
@@ -184,6 +191,12 @@ document.querySelectorAll(".modal-close, .modal-cancel").forEach(btn => {
   btn.onclick = () => menuModal.classList.remove("active");
 });
 
+// ---------- Menu Form Inputs ----------
+const itemName = document.getElementById("item-name");
+const itemPrice = document.getElementById("item-price");
+const itemImage = document.getElementById("item-image");
+const itemCategory = document.getElementById("item-category");
+
 menuForm.onsubmit = e => {
   e.preventDefault();
   const id = document.getElementById("item-id").value;
@@ -206,18 +219,27 @@ menuForm.onsubmit = e => {
 };
 
 // ---------- Pay Now ----------
-document.getElementById("pay-now").onclick = () => {
-  if (cart.length === 0) return alert("Cart is empty");
+const payNowBtn = document.getElementById("pay-now");
 
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  payAmount.textContent = `₹${total}`;
+payNowBtn.onclick = () => {
+  if (cart.length === 0) {
+    alert("Cart is empty");
+    return;
+  }
+
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+  payAmount.textContent = `₹${total.toFixed(2)}`;
   qrContainer.innerHTML = "";
 
-  QRCode.toCanvas(qrContainer, `upi://pay?pa=southdelight@paytm&am=${total}`, () => {});
+  QRCode.toCanvas(
+    qrContainer,
+    `upi://pay?pa=southdelight@paytm&pn=South%20Delight&am=${total}&cu=INR`,
+    () => {}
+  );
+
   payModal.classList.add("active");
 };
-
-document.querySelector(".pay-close").onclick = () => payModal.classList.remove("active");
 
 // ---------- Confirm Payment ----------
 document.getElementById("confirm-payment").onclick = () => {
@@ -230,8 +252,10 @@ document.getElementById("confirm-payment").onclick = () => {
   saveCart();
   renderCart();
   payModal.classList.remove("active");
+
   alert("Payment successful!");
 };
+
 
 // ---------- Print ----------
 document.getElementById("print-bill").onclick = () => window.print();
