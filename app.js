@@ -6,7 +6,7 @@
 const MENU_KEY = "sd_menu";
 const CART_KEY = "sd_cart";
 const SALES_KEY = "sd_sales";
-
+ 
 // ---------- Default Menu ----------
 const defaultMenu = [
   { id: 1, name: "Idly", price: 30, image: "idly.jpg", category: "Breakfast" },
