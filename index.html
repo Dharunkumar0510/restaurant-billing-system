@@ -51,17 +51,19 @@
 
 <!-- ADD / EDIT MENU MODAL -->
 <div id="menu-modal" class="modal">
-  <div class="modal-content">
-    <span class="modal-close">&times;</span>
-    <form id="menu-form">
-      <input type="hidden" id="item-id">
-      <input id="item-name" placeholder="Item name" required>
-      <input id="item-price" type="number" placeholder="Price" required>
-      <input id="item-image" placeholder="Image (idly.jpg)">
-      <input id="item-category" placeholder="Category">
-      <button type="submit">Save</button>
-    </form>
+  <div class="content">
+  <div class="menu-section">
+    <h2>Our Menu</h2>
+    <div id="menu-grid" class="menu-grid"></div>
   </div>
+
+  <div class="cart-section">
+    <h3>Your Order</h3>
+    <div id="cart-items"></div>
+    <p>Total: <span id="cart-total">₹0</span></p>
+    <button id="pay-now">Pay Now</button>
+  </div>
+</div>
 </div>
 
 <!-- PAY MODAL -->
