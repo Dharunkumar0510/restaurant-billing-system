@@ -1,6 +1,6 @@
 /***********************
  * Dharun's Delight - app.js
- ***********************/
+ ***********************/ 
 
 // ---------- Local Storage Keys ----------
 const MENU_KEY = "sd_menu";
