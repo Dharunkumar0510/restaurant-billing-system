@@ -1,25 +1,22 @@
- // ===== PAYMENT ELEMENTS =====
-const payModal = document.getElementById("pay-modal");
-const payClose = document.querySelector(".pay-close");
-const payAmountText = document.getElementById("pay-amount");
-
-const UPI_ID = "southdelight@paytm";
-/***********************
- * South Delight - app.js
- ***********************/
+/*******************************
+ * Dharun's Delight - app.js
+ *******************************/
 
 // ---------- Local Storage Keys ----------
-const MENU_KEY = "sd_menu";
-const CART_KEY = "sd_cart";
-const SALES_KEY = "sd_sales";
+const MENU_KEY = "dd_menu";
+const CART_KEY = "dd_cart";
+const SALES_KEY = "dd_sales";
+
+// ---------- UPI ----------
+const UPI_ID = "southdelight@paytm"; // change later if needed
 
 // ---------- Default Menu ----------
 const defaultMenu = [
-  { id: 1, name: "Idly", price: 30, image: "idly.jpg", category: "Breakfast" },
-  { id: 2, name: "Dosa", price: 50, image: "dosa.jpg", category: "Breakfast" },
-  { id: 3, name: "Poori", price: 45, image: "poori.jpg", category: "Breakfast" },
-  { id: 4, name: "Vada", price: 15, image: "vada.jpg", category: "Snacks" },
-  { id: 5, name: "Coffee", price: 20, image: "coffee.jpg", category: "Beverage" },
+  { id: 1, name: "Idly", price: 30, image: "", category: "Breakfast" },
+  { id: 2, name: "Dosa", price: 50, image: "", category: "Breakfast" },
+  { id: 3, name: "Poori", price: 45, image: "", category: "Breakfast" },
+  { id: 4, name: "Vada", price: 15, image: "", category: "Snacks" },
+  { id: 5, name: "Coffee", price: 20, image: "", category: "Beverage" },
 ];
 
 // ---------- State ----------
@@ -37,22 +34,24 @@ const addMenuBtn = document.getElementById("add-menu-btn");
 const menuModal = document.getElementById("menu-modal");
 const menuForm = document.getElementById("menu-form");
 
+const payNowBtn = document.getElementById("pay-now");
 const payModal = document.getElementById("pay-modal");
+const payClose = document.querySelector(".pay-close");
 const qrContainer = document.getElementById("qr-code");
 const payAmount = document.getElementById("pay-amount");
 
 // ---------- Navigation ----------
 document.querySelectorAll(".nav-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
+  btn.onclick = () => {
     document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
     document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
 
     btn.classList.add("active");
     document.getElementById(`${btn.dataset.view}-view`).classList.add("active");
-  });
+  };
 });
 
-// ---------- Menu Rendering ----------
+// ---------- Render Menu ----------
 function renderMenu() {
   menuGrid.innerHTML = "";
   menu.forEach(item => {
@@ -63,7 +62,7 @@ function renderMenu() {
       <div class="menu-item-info">
         <div class="menu-item-name">${item.name}</div>
         <div class="menu-item-price">₹${item.price}</div>
-        <div class="menu-item-category">${item.category || ""}</div>
+        <div class="menu-item-category">${item.category}</div>
       </div>
     `;
     div.onclick = () => addToCart(item);
@@ -83,6 +82,7 @@ function addToCart(item) {
 
 function renderCart() {
   cartItems.innerHTML = "";
+
   if (cart.length === 0) {
     cartItems.innerHTML = `<p class="empty-cart">Cart is empty. Click items to add.</p>`;
     cartTotal.textContent = "₹0";
@@ -90,35 +90,19 @@ function renderCart() {
   }
 
   let total = 0;
+
   cart.forEach(item => {
     total += item.price * item.qty;
 
     const row = document.createElement("div");
     row.className = "cart-row";
     row.innerHTML = `
-      <div class="cart-row-info">
-        <div class="cart-row-name">${item.name}</div>
-        <div class="cart-row-qty">Qty: ${item.qty}</div>
+      <div>
+        <strong>${item.name}</strong><br>
+        Qty: ${item.qty}
       </div>
-      <div class="cart-row-actions">
-        <button class="qty-btn">+</button>
-        <button class="qty-btn">−</button>
-        <button class="remove-btn">×</button>
-      </div>
-      <div class="cart-row-price">₹${item.price * item.qty}</div>
+      <div>₹${item.price * item.qty}</div>
     `;
-
-    row.querySelectorAll(".qty-btn")[0].onclick = () => { item.qty++; saveCart(); renderCart(); };
-    row.querySelectorAll(".qty-btn")[1].onclick = () => {
-      item.qty--;
-      if (item.qty <= 0) cart = cart.filter(c => c.id !== item.id);
-      saveCart(); renderCart();
-    };
-    row.querySelector(".remove-btn").onclick = () => {
-      cart = cart.filter(c => c.id !== item.id);
-      saveCart(); renderCart();
-    };
-
     cartItems.appendChild(row);
   });
 
@@ -147,70 +131,42 @@ function renderManageMenu() {
     const div = document.createElement("div");
     div.className = "manage-item";
     div.innerHTML = `
-      <img class="manage-item-img" src="${item.image || "https://via.placeholder.com/100"}">
-      <div class="manage-item-info">
-        <div class="manage-item-name">${item.name}</div>
-        <div class="manage-item-price">₹${item.price}</div>
-      </div>
-      <div class="manage-item-actions">
-        <button class="btn btn-secondary">Edit</button>
-        <button class="btn btn-danger">Delete</button>
-      </div>
+      <strong>${item.name}</strong> - ₹${item.price}
+      <button class="btn btn-danger">Delete</button>
     `;
-
-    div.querySelector(".btn-secondary").onclick = () => openMenuModal(item);
-    div.querySelector(".btn-danger").onclick = () => {
+    div.querySelector("button").onclick = () => {
       menu = menu.filter(m => m.id !== item.id);
       saveMenu();
       renderMenu();
       renderManageMenu();
     };
-
     manageList.appendChild(div);
   });
 }
 
-// ---------- Modal ----------
-addMenuBtn.onclick = () => openMenuModal();
-
-function openMenuModal(item = null) {
-  menuModal.classList.add("active");
+// ---------- Menu Modal ----------
+addMenuBtn.onclick = () => {
   menuForm.reset();
-
-  if (item) {
-    document.getElementById("item-id").value = item.id;
-    document.getElementById("item-name").value = item.name;
-    document.getElementById("item-price").value = item.price;
-    document.getElementById("item-image").value = item.image;
-    document.getElementById("item-category").value = item.category;
-  }
-}
+  menuModal.classList.add("active");
+};
 
 document.querySelectorAll(".modal-close, .modal-cancel").forEach(btn => {
   btn.onclick = () => menuModal.classList.remove("active");
 });
 
-// ---------- Menu Form Inputs ----------
-const itemName = document.getElementById("item-name");
-const itemPrice = document.getElementById("item-price");
-const itemImage = document.getElementById("item-image");
-const itemCategory = document.getElementById("item-category");
-
+// ---------- Menu Form ----------
 menuForm.onsubmit = e => {
   e.preventDefault();
-  const id = document.getElementById("item-id").value;
 
   const item = {
-    id: id || Date.now(),
-    name: itemName.value,
-    price: +itemPrice.value,
-    image: itemImage.value,
-    category: itemCategory.value
+    id: Date.now(),
+    name: document.getElementById("item-name").value,
+    price: +document.getElementById("item-price").value,
+    image: document.getElementById("item-image").value,
+    category: document.getElementById("item-category").value,
   };
 
-  if (id) menu = menu.map(m => m.id == id ? item : m);
-  else menu.push(item);
-
+  menu.push(item);
   saveMenu();
   renderMenu();
   renderManageMenu();
@@ -218,34 +174,33 @@ menuForm.onsubmit = e => {
 };
 
 // ---------- Pay Now ----------
-const payNowBtn = document.getElementById("pay-now");
-
 payNowBtn.onclick = () => {
   if (cart.length === 0) {
     alert("Cart is empty");
     return;
   }
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  payAmount.textContent = `₹${total}`;
 
-  payAmount.textContent = `₹${total.toFixed(2)}`;
   qrContainer.innerHTML = "";
+  const canvas = document.createElement("canvas");
+  qrContainer.appendChild(canvas);
 
   QRCode.toCanvas(
-    qrContainer,
-    `upi://pay?pa=southdelight@paytm&pn=South%20Delight&am=${total}&cu=INR`,
-    () => {}
+    canvas,
+    `upi://pay?pa=${UPI_ID}&pn=Dharuns%20Delight&am=${total}&cu=INR`
   );
 
   payModal.classList.add("active");
 };
 
+payClose.onclick = () => payModal.classList.remove("active");
+
 // ---------- Confirm Payment ----------
 document.getElementById("confirm-payment").onclick = () => {
-  const month = new Date().toISOString().slice(0, 7);
-  const sales = JSON.parse(localStorage.getItem(SALES_KEY)) || {};
-  sales[month] = (sales[month] || []).concat(cart);
-  localStorage.setItem(SALES_KEY, JSON.stringify(sales));
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  saveMonthlySales(cart, total);
 
   cart = [];
   saveCart();
@@ -259,6 +214,42 @@ document.getElementById("confirm-payment").onclick = () => {
 // ---------- Print ----------
 document.getElementById("print-bill").onclick = () => window.print();
 document.getElementById("print-report").onclick = () => window.print();
+function saveMonthlySales(cart, total) {
+  const monthKey = new Date().toISOString().slice(0, 7); // YYYY-MM
+  let sales = JSON.parse(localStorage.getItem(SALES_KEY)) || {};
+
+  if (!sales[monthKey]) {
+    sales[monthKey] = {
+      orders: 0,
+      revenue: 0,
+      items: []
+    };
+  }
+
+  sales[monthKey].orders += 1;
+  sales[monthKey].revenue += total;
+  sales[monthKey].items.push(...cart);
+
+  localStorage.setItem(SALES_KEY, JSON.stringify(sales));
+}
+document.getElementById("generate-report").onclick = () => {
+  const sales = JSON.parse(localStorage.getItem(SALES_KEY)) || {};
+  const month = new Date().toISOString().slice(0, 7);
+
+  if (!sales[month]) {
+    alert("No sales for this month");
+    return;
+  }
+
+  const report = sales[month];
+
+  alert(
+     Month: ${month}\n` +
+     Orders: ${report.orders}\n` +
+     Revenue: ₹${report.revenue}`
+  );
+};
+
 
 // ---------- Init ----------
 renderMenu();
