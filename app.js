@@ -1,4 +1,4 @@
-// ===== PAYMENT ELEMENTS =====
+ // ===== PAYMENT ELEMENTS =====
 const payModal = document.getElementById("pay-modal");
 const payClose = document.querySelector(".pay-close");
 const payAmountText = document.getElementById("pay-amount");
