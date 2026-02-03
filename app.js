@@ -1,29 +1,26 @@
-/*******************************
- * Dharun's Delight - app.js
- *******************************/
+/***********************
+ Dharun’s Delight - app.js
+***********************/
 
-// ---------- Local Storage Keys ----------
+// ---------- STORAGE KEYS ----------
 const MENU_KEY = "dd_menu";
 const CART_KEY = "dd_cart";
 const SALES_KEY = "dd_sales";
 
-// ---------- UPI ----------
-const UPI_ID = "southdelight@paytm"; // change later if needed
-
-// ---------- Default Menu ----------
+// ---------- DEFAULT MENU ----------
 const defaultMenu = [
-  { id: 1, name: "Idly", price: 30, image: "", category: "Breakfast" },
-  { id: 2, name: "Dosa", price: 50, image: "", category: "Breakfast" },
-  { id: 3, name: "Poori", price: 45, image: "", category: "Breakfast" },
-  { id: 4, name: "Vada", price: 15, image: "", category: "Snacks" },
-  { id: 5, name: "Coffee", price: 20, image: "", category: "Beverage" },
+  { id: 1, name: "Idly", price: 30, image: "idly.jpg", category: "Breakfast" },
+  { id: 2, name: "Dosa", price: 50, image: "dosa.jpg", category: "Breakfast" },
+  { id: 3, name: "Poori", price: 45, image: "poori.jpg", category: "Breakfast" },
+  { id: 4, name: "Vada", price: 15, image: "vada.jpg", category: "Snacks" },
+  { id: 5, name: "Coffee", price: 20, image: "coffee.jpg", category: "Beverage" }
 ];
 
-// ---------- State ----------
+// ---------- STATE ----------
 let menu = JSON.parse(localStorage.getItem(MENU_KEY)) || defaultMenu;
 let cart = JSON.parse(localStorage.getItem(CART_KEY)) || [];
 
-// ---------- Elements ----------
+// ---------- ELEMENTS ----------
 const menuGrid = document.getElementById("menu-grid");
 const cartItems = document.getElementById("cart-items");
 const cartTotal = document.getElementById("cart-total");
@@ -34,45 +31,38 @@ const addMenuBtn = document.getElementById("add-menu-btn");
 const menuModal = document.getElementById("menu-modal");
 const menuForm = document.getElementById("menu-form");
 
-const payNowBtn = document.getElementById("pay-now");
 const payModal = document.getElementById("pay-modal");
-const payClose = document.querySelector(".pay-close");
 const qrContainer = document.getElementById("qr-code");
 const payAmount = document.getElementById("pay-amount");
 
-// ---------- Navigation ----------
+// ---------- NAV ----------
 document.querySelectorAll(".nav-btn").forEach(btn => {
   btn.onclick = () => {
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
     document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    document.getElementById(`${btn.dataset.view}-view`).classList.add("active");
+    document.getElementById(btn.dataset.view + "-view").classList.add("active");
   };
 });
 
-// ---------- Render Menu ----------
+// ---------- MENU ----------
 function renderMenu() {
   menuGrid.innerHTML = "";
   menu.forEach(item => {
     const div = document.createElement("div");
-    div.className = "menu-item";
     div.innerHTML = `
-      <img class="menu-item-img" src="${item.image || "https://via.placeholder.com/300"}">
-      <div class="menu-item-info">
-        <div class="menu-item-name">${item.name}</div>
-        <div class="menu-item-price">₹${item.price}</div>
-        <div class="menu-item-category">${item.category}</div>
-      </div>
+      <img src="${item.image}">
+      <h4>${item.name}</h4>
+      <p>₹${item.price}</p>
     `;
     div.onclick = () => addToCart(item);
     menuGrid.appendChild(div);
   });
 }
 
-// ---------- Cart ----------
+// ---------- CART ----------
 function addToCart(item) {
-  const found = cart.find(c => c.id === item.id);
+  const found = cart.find(i => i.id === item.id);
   if (found) found.qty++;
   else cart.push({ ...item, qty: 1 });
 
@@ -82,176 +72,107 @@ function addToCart(item) {
 
 function renderCart() {
   cartItems.innerHTML = "";
-
-  if (cart.length === 0) {
-    cartItems.innerHTML = `<p class="empty-cart">Cart is empty. Click items to add.</p>`;
-    cartTotal.textContent = "₹0";
-    return;
-  }
-
   let total = 0;
 
-  cart.forEach(item => {
-    total += item.price * item.qty;
-
-    const row = document.createElement("div");
-    row.className = "cart-row";
-    row.innerHTML = `
-      <div>
-        <strong>${item.name}</strong><br>
-        Qty: ${item.qty}
-      </div>
-      <div>₹${item.price * item.qty}</div>
-    `;
-    cartItems.appendChild(row);
+  cart.forEach(i => {
+    total += i.price * i.qty;
+    cartItems.innerHTML += `<p>${i.name} x ${i.qty}</p>`;
   });
 
   cartTotal.textContent = `₹${total}`;
 }
 
-// ---------- Save ----------
 function saveCart() {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
 }
-function saveMenu() {
-  localStorage.setItem(MENU_KEY, JSON.stringify(menu));
-}
 
-// ---------- Clear Cart ----------
+// ---------- CLEAR CART ----------
 document.getElementById("clear-cart").onclick = () => {
   cart = [];
   saveCart();
   renderCart();
 };
 
-// ---------- Manage Menu ----------
+// ---------- MANAGE MENU ----------
 function renderManageMenu() {
   manageList.innerHTML = "";
   menu.forEach(item => {
     const div = document.createElement("div");
-    div.className = "manage-item";
     div.innerHTML = `
-      <strong>${item.name}</strong> - ₹${item.price}
-      <button class="btn btn-danger">Delete</button>
+      <img src="${item.image}">
+      <b>${item.name}</b> ₹${item.price}
+      <button onclick="deleteItem(${item.id})">Delete</button>
     `;
-    div.querySelector("button").onclick = () => {
-      menu = menu.filter(m => m.id !== item.id);
-      saveMenu();
-      renderMenu();
-      renderManageMenu();
-    };
     manageList.appendChild(div);
   });
 }
 
-// ---------- Menu Modal ----------
-addMenuBtn.onclick = () => {
-  menuForm.reset();
-  menuModal.classList.add("active");
-};
-
-document.querySelectorAll(".modal-close, .modal-cancel").forEach(btn => {
-  btn.onclick = () => menuModal.classList.remove("active");
-});
-
-// ---------- Menu Form ----------
-menuForm.onsubmit = e => {
-  e.preventDefault();
-
-  const item = {
-    id: Date.now(),
-    name: document.getElementById("item-name").value,
-    price: +document.getElementById("item-price").value,
-    image: document.getElementById("item-image").value,
-    category: document.getElementById("item-category").value,
-  };
-
-  menu.push(item);
-  saveMenu();
+function deleteItem(id) {
+  menu = menu.filter(i => i.id !== id);
+  localStorage.setItem(MENU_KEY, JSON.stringify(menu));
   renderMenu();
   renderManageMenu();
+}
+
+// ---------- ADD MENU ----------
+addMenuBtn.onclick = () => menuModal.classList.add("active");
+
+menuForm.onsubmit = e => {
+  e.preventDefault();
+  const item = {
+    id: Date.now(),
+    name: itemName.value,
+    price: +itemPrice.value,
+    image: itemImage.value,
+    category: itemCategory.value
+  };
+  menu.push(item);
+  localStorage.setItem(MENU_KEY, JSON.stringify(menu));
   menuModal.classList.remove("active");
+  renderMenu();
+  renderManageMenu();
 };
 
-// ---------- Pay Now ----------
-payNowBtn.onclick = () => {
-  if (cart.length === 0) {
-    alert("Cart is empty");
-    return;
-  }
+// ---------- PAY ----------
+document.getElementById("pay-now").onclick = () => {
+  if (!cart.length) return alert("Cart empty");
 
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   payAmount.textContent = `₹${total}`;
-
   qrContainer.innerHTML = "";
-  const canvas = document.createElement("canvas");
-  qrContainer.appendChild(canvas);
 
   QRCode.toCanvas(
-    canvas,
-    `upi://pay?pa=${UPI_ID}&pn=Dharuns%20Delight&am=${total}&cu=INR`
+    qrContainer,
+    `upi://pay?pa=southdelight@paytm&pn=DharunsDelight&am=${total}&cu=INR`
   );
 
   payModal.classList.add("active");
 };
 
-payClose.onclick = () => payModal.classList.remove("active");
-
-// ---------- Confirm Payment ----------
+// ---------- CONFIRM PAYMENT ----------
 document.getElementById("confirm-payment").onclick = () => {
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  saveMonthlySales(cart, total);
+  const month = new Date().toISOString().slice(0, 7);
+  const sales = JSON.parse(localStorage.getItem(SALES_KEY)) || {};
+  sales[month] = (sales[month] || 0) + cart.reduce((s, i) => s + i.price * i.qty, 0);
+  localStorage.setItem(SALES_KEY, JSON.stringify(sales));
 
   cart = [];
   saveCart();
   renderCart();
   payModal.classList.remove("active");
 
-  alert("Payment successful!");
+  alert("Payment Successful");
 };
 
-
-// ---------- Print ----------
-document.getElementById("print-bill").onclick = () => window.print();
-document.getElementById("print-report").onclick = () => window.print();
-function saveMonthlySales(cart, total) {
-  const monthKey = new Date().toISOString().slice(0, 7); // YYYY-MM
-  let sales = JSON.parse(localStorage.getItem(SALES_KEY)) || {};
-
-  if (!sales[monthKey]) {
-    sales[monthKey] = {
-      orders: 0,
-      revenue: 0,
-      items: []
-    };
-  }
-
-  sales[monthKey].orders += 1;
-  sales[monthKey].revenue += total;
-  sales[monthKey].items.push(...cart);
-
-  localStorage.setItem(SALES_KEY, JSON.stringify(sales));
-}
+// ---------- REPORT ----------
 document.getElementById("generate-report").onclick = () => {
+  const month = document.getElementById("report-month").value;
   const sales = JSON.parse(localStorage.getItem(SALES_KEY)) || {};
-  const month = new Date().toISOString().slice(0, 7);
-
-  if (!sales[month]) {
-    alert("No sales for this month");
-    return;
-  }
-
-  const report = sales[month];
-
-  alert(
-     Month: ${month}\n` +
-     Orders: ${report.orders}\n` +
-     Revenue: ₹${report.revenue}`
-  );
+  document.getElementById("report-content").innerHTML =
+    sales[month] ? `Total Sales: ₹${sales[month]}` : "No sales";
 };
 
-
-// ---------- Init ----------
+// ---------- INIT ----------
 renderMenu();
 renderCart();
 renderManageMenu();
