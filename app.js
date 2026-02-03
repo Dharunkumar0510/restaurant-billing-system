@@ -5,7 +5,7 @@
 // ---------- STORAGE KEYS ----------
 const MENU_KEY = "dd_menu";
 const CART_KEY = "dd_cart";
-const SALES_KEY = "dd_sales";
+const SALES_KEY = "dd_sales"; 
 
 // ---------- DEFAULT MENU ----------
 const defaultMenu = [
